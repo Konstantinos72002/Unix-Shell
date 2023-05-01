@@ -72,19 +72,48 @@ std::vector<std::string> tokenize(const std::string &s)
     return ret;
 }
 
-char ** strlist(vector<string> &input) {
-    char** result = new char*[input.size()];
-    result[input.size()] = nullptr;
-    for (int i=0; i<input.size(); i++) {
-        char *temp = new char[input[i].size()];
-        strcpy(temp, input[i].c_str());
-        result[i] = temp;
+char** strlist(vector<string>& strings) {
+    
+    char** charArray = new char*[strings.size() + 1];
+
+    for (size_t i = 0; i < strings.size(); i++) {
+        charArray[i] = new char[strings[i].size() + 1];
+        std::strcpy(charArray[i], strings[i].c_str());
     }
-    return result;
+
+    charArray[strings.size()] = NULL;
+
+    return charArray;
 }
 
 char* str_to_chars(string &input) {
+    
     char* result = new char[input.size() + 1];
     strcpy(result, input.c_str());
     return result;
+}
+
+vector<string> concatenate_redirections(vector<string> &line) {
+    
+    vector<string> return_vector;
+    
+    for(vector<string>::iterator it = line.begin(); it != line.end(); ++it) {
+        
+        string current = *it;
+        if(it == line.end()-1) {
+            return_vector.push_back(current);
+            break;
+        }
+        
+        string next = *(it+1);
+
+        if(current == next && current == ">") {
+            return_vector.push_back(">>");
+            it++;
+        } 
+        else {
+            return_vector.push_back(current);
+        }
+    } 
+    return return_vector;
 }

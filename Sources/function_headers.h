@@ -2,7 +2,7 @@
 
 using namespace std;
 
-class process {
+class Process {
 	string name;
 	vector<string> arguments;
 	pid_t pid;
@@ -19,12 +19,42 @@ class process {
 		int num_of_arguments();
 };
 
+class Files {
+	string input;
+	vector<tuple<string,bool>> outputs;
+
+	public:
+		string get_input();
+		vector<tuple<string,bool>> get_outputs();
+		vector<bool> get_flags();
+		bool input_is_empty();
+		bool outputs_is_empty();
+		void insert_input(string);
+		void insert_output(string,bool);
+};
+
 vector<string> tokenize(const string &);
 
-vector<int> execute(vector<string>,process &,string &,string &,vector<process>,vector<int>);
+vector<int> parser(vector<string>,Process &,Files &,vector<Process>,vector<Process> &);
 
-void execute_main_process(process &);
+vector<string> concatenate_redirections(vector<string> &);
+
+void execute_files(Files &);
+
+string execute_processes(Process &,vector<Process> &,vector<Process> &,Files &,list<string> &);
+
+void recursive_pipes(vector<Process> &);
+
+string execute_main_process(Process &,list<string> &,Files &);
+
+// void execute_with_files(Process &, Files &);
+
+void execute_inputs(string);
+
+void execute_outputs(vector<tuple<string,bool>>);
 
 char ** strlist(vector<string> &);
 
-char* str_to_chars(string &input);
+char* str_to_chars(string &);
+
+void add_to_history(list<string> &,string &);

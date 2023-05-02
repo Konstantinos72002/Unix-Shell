@@ -6,6 +6,7 @@ class Process {
 	string name;
 	vector<string> arguments;
 	pid_t pid;
+	bool is_background;
 	
 	public:
 		string get_name();
@@ -17,6 +18,8 @@ class Process {
 		void print_informations();
 		const void print_arguments(vector<string>); 
 		int num_of_arguments();
+		void set_background(bool);
+		bool get_background();
 };
 
 class Files {
@@ -35,13 +38,15 @@ class Files {
 
 vector<string> tokenize(const string &);
 
-vector<int> parser(vector<string>,Process &,Files &,vector<Process>,vector<Process> &);
+vector<vector<string>> find_processes(vector<string> &);
 
-vector<string> concatenate_redirections(vector<string> &);
+vector<int> parser(vector<string>,Process &,Files &,vector<Process> &);
+
+vector<string> concatenate(vector<string> &);
 
 void execute_files(Files &);
 
-string execute_processes(Process &,vector<Process> &,vector<Process> &,Files &,list<string> &);
+string execute_processes(Process &,vector<Process> &,vector<pid_t> &,Files &,list<string> &);
 
 void recursive_pipes(vector<Process> &);
 
@@ -58,3 +63,9 @@ char ** strlist(vector<string> &);
 char* str_to_chars(string &);
 
 void add_to_history(list<string> &,string &);
+
+string special_cases(Process &,list<string> &);
+
+void background_start(Process &,vector<pid_t> &);
+
+void background_end(Process &,vector<pid_t> &);

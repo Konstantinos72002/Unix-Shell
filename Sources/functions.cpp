@@ -59,7 +59,7 @@ std::vector<std::string> tokenize(const std::string &s)
 
     for (int i = 0; i < ret.size(); ++i)
     {
-        for (auto c : {'&', '<', '>', '|'})
+        for (auto c : {'&', '<', '>', '|', ';'})
         {
             if (splitOnSymbol(ret, i, c))
             {
@@ -93,7 +93,7 @@ char* str_to_chars(string &input) {
     return result;
 }
 
-vector<string> concatenate_redirections(vector<string> &line) {
+vector<string> concatenate(vector<string> &line) {
     
     vector<string> return_vector;
     
@@ -110,10 +110,31 @@ vector<string> concatenate_redirections(vector<string> &line) {
         if(current == next && current == ">") {
             return_vector.push_back(">>");
             it++;
-        } 
-        else {
+        } else {
             return_vector.push_back(current);
         }
+
     } 
+    return return_vector;
+}
+
+vector<vector<string>> find_processes(vector<string> &lines) {
+    vector<vector<string>> return_vector;
+    
+    for(vector<string>::iterator it = lines.begin(); it != lines.end() ; it++) {
+    vector<string> line;
+    
+        while(*it != ";") {
+            line.push_back(*it);
+            it++;
+            if(it == lines.end()) break;
+        }
+        
+        return_vector.push_back(line);
+        int size = line.size();
+        for(int i = 0 ; i < size ; i++) line.pop_back();
+        if (it == lines.end()) break;
+    }
+    
     return return_vector;
 }

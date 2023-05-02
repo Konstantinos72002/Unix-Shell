@@ -5,26 +5,40 @@ int main() {
     string line;
     list<string> history;
     string out;
+    vector<pid_t> background;
     // make reading
     while (true) {
         
-        cout << "in-mysh-now:> " << out;
+        
+        if (out != "") {
+            cout << "in-mysh-now:> " << out;
+            line = out;
+            string next;
+            getline(cin,next);
+            line = line + next;
+        }
+        else {
+            cout << "in-mysh-now:> ";
+            getline(cin,line);
+        }
         out = "";
-        getline(cin,line);
         
-        
+       
         add_to_history(history,line);
 
         vector<string> tempt_split_line = tokenize(line);
-        vector<string> split_line = concatenate_redirections(tempt_split_line);
+        vector<string> split_line = concatenate(tempt_split_line);
+        vector<vector<string>> lines = find_processes(split_line);
+        for(vector<vector<string>>::iterator it = lines.begin(); it != lines.end(); it++) {
+            vector<string> line = *it;
 
-        Process main_process;
-        Files files;
-        vector<Process> background_processes;
-        vector<Process> pipes;
-       
-        vector<int> details = parser(split_line,main_process,files,background_processes,pipes);
+            Process main_process;
+            Files files;
+            vector<Process> pipes;
         
-        out = execute_processes(main_process,background_processes,pipes,files,history);
+            vector<int> details = parser(line,main_process,files,pipes);
+            
+            out = execute_processes(main_process,pipes,background,files,history);
+        }
     }
 }

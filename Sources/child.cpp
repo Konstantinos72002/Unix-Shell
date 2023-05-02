@@ -8,22 +8,26 @@ void execute_files(Files &files) {
 		execute_outputs(files.get_outputs());
 	}
 }
-
-string execute_processes(Process &main_process,vector<Process> &background_processes,vector<Process> &pipes,
+int children = 0;
+string execute_processes(Process &main_process,vector<Process> &pipes,vector<pid_t> &background,
 Files &files , list<string> &history) {
 	
+	string r_str = special_cases(main_process,history);
+	if (r_str != "") return r_str;
+
 	if(pipes.size() == 0) {
-		
+		children++;
 		pid_t pid = fork();
 		if(pid == 0) {
-			return execute_main_process(main_process,history,files);
+			execute_main_process(main_process,history,files);
 		}
 		else {
-			int status;
-			wait(&status);
+			if(!main_process.get_background()) {
+				int status;
+				wait(&status);
+			}	
 		}
-		return "";
-	} else {
+	} else if(pipes.size()){
 
 		int num_of_pipes = pipes.size()-1;
 		vector<int[2]> fd(num_of_pipes);
@@ -48,6 +52,7 @@ Files &files , list<string> &history) {
 					execute_main_process(pipes[i],history,files);
 					close(fd[i-1][0]);  //close read
 				} else {
+					
 					close(fd[i-1][1]); 
 					dup2(fd[i-1][0], STDIN_FILENO); // read from previuous
 					close(fd[i][0]);
@@ -72,12 +77,26 @@ Files &files , list<string> &history) {
    	 	}
 		
 
-	}
+	} 
+	// if(background_processes.size() > 0) {
+	// 	// cout << background_processes.size() << endl;
+	// 	int counter = 1;
+	// 	for(vector<Process>::iterator it = background_processes.begin() ; it != background_processes.end(); it++) {
+	// 		Process process = *it;
+	// 		pid_t pid = fork();
+	// 		if (pid == 0) {
+	// 			execute_main_process(process,history,files);
+	// 		}
+	// 		cout << "[" << counter << "]" << " " << getpid() << endl;
+	// 		counter++;
+	// 	}
+	// }
 
 return "";
 }
 
 string execute_main_process(Process &process, list<string> &history, Files &files) {
+	
 	execute_files(files);
 	int num_of_args = process.num_of_arguments();
 	vector<string> vector_arguments = process.get_arguments();
@@ -88,19 +107,6 @@ string execute_main_process(Process &process, list<string> &history, Files &file
 	
 	char * process_name = str_to_chars(process_name_string);
 	
-	if(!strcmp(process_name,"history") && process.get_arguments().size() == 1) {
-		cout << "Last " << history.size() << " executes:" << endl;
-		for(list<string>::iterator it = history.begin(); it != history.end() ; it++) {
-			cout << *it << endl;
-		}
-		return "";
-	}
-
-	if(!strcmp(process_name,"history")) {
-		list<string>::iterator it = history.begin();
-		for(int i = 0; i < stoi(process.get_arguments()[1]); i++) it++;
-		return *it;
-	}
 
 	execvp(process_name, arguments);
 	perror("execvp"); // execvp returns only if an error occurred
@@ -139,11 +145,30 @@ void execute_outputs(vector<tuple<string,bool>> outputs) {
 		if(flag) {
 			outfile = open(output_c, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 		} else {
-			outfile = open(output_c, O_WRONLY | O_APPEND , S_IRUSR | S_IWUSR);
+			outfile = open(output_c, O_WRONLY | O_CREAT | O_APPEND , S_IRUSR | S_IWUSR);
 		}
 			if (*it == *(outputs.end() - 1)) {
 				dup2(outfile, STDOUT_FILENO);
 				close(outfile);
 			}
 	}
+}
+
+string special_cases(Process &process,list<string> &history) {
+
+	if(process.get_name() == "history" && process.get_arguments().size() == 1) {
+		cout << "Last " << history.size() << " executes:" << endl;
+		for(list<string>::iterator it = history.begin(); it != history.end() ; it++) {
+			cout << *it << endl;
+		}
+		return "";
+	}
+
+	if(process.get_name() == "history") {
+		
+		list<string>::iterator it = history.begin();
+		for(int i = 0; i < stoi(process.get_arguments()[1]); i++) it++;
+		return *it;
+	}
+	return "";
 }

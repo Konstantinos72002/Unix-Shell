@@ -41,3 +41,10 @@ const void Process::print_arguments(vector<string> arguments) {
 int Process::num_of_arguments() {
 	return arguments.size();
 }
+
+void Process::set_background(bool flag) {
+	this->is_background = flag;
+}
+bool Process::get_background() {
+	return this->is_background;
+}

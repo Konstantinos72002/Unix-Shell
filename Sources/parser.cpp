@@ -1,7 +1,7 @@
 #include "headers.h"
 #define is_special(tokken) (tokken == ">" || tokken == "<" || tokken == ">>" || tokken == "|" || tokken == "&" || tokken == ">>" || tokken == "\0")
 
-vector<int> parser(vector<string> line,Process &main_process,
+void parser(vector<string> line,Process &main_process,
 Files & files,vector<Process> &pipes) {
 
 	vector<int> details(4,0);
@@ -98,5 +98,5 @@ Files & files,vector<Process> &pipes) {
  		it++;
 	}
 	
-	return details;
+	return;
 }

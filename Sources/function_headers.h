@@ -20,6 +20,7 @@ class Process {
 		int num_of_arguments();
 		void set_background(bool);
 		bool get_background();
+		void change_all_arguments(vector<string>&);
 };
 
 class Files {
@@ -36,21 +37,22 @@ class Files {
 		void insert_output(string,bool);
 };
 
-vector<string> tokenize(const string &);
+vector<string> string_line_to_vector(string &);
 
 vector<vector<string>> find_processes(vector<string> &);
 
-vector<int> parser(vector<string>,Process &,Files &,vector<Process> &);
+void parser(vector<string>,Process &,Files &,vector<Process> &);
 
 vector<string> concatenate(vector<string> &);
 
 void execute_files(Files &);
 
-string execute_processes(Process &,vector<Process> &,vector<pid_t> &,Files &,list<string> &);
+tuple<string,string> execute_processes(Process &,vector<Process> &,vector<pid_t> &,Files &,list<string> &,
+struct sigaction &,struct sigaction &,map<string,vector<string>> &);
 
 void recursive_pipes(vector<Process> &);
 
-string execute_main_process(Process &,list<string> &,Files &);
+string execute_main_process(Process &,list<string> &,Files &,bool);
 
 // void execute_with_files(Process &, Files &);
 
@@ -64,8 +66,26 @@ char* str_to_chars(string &);
 
 void add_to_history(list<string> &,string &);
 
-string special_cases(Process &,list<string> &);
+tuple<string,string> special_cases(Process &,list<string> &,map<string,vector<string>> &);
 
 void background_start(Process &,vector<pid_t> &);
 
 void background_end(Process &,vector<pid_t> &);
+
+void wildcards(Process &,vector<Process> &);
+
+void fix_args(Process &);
+
+void print_path(list<string> &,string &);
+
+list<string> fix_path(list<string> &);
+
+list<string> path_string_to_list(string &);
+
+void merge_path(list<string> &, list<string> &);
+
+vector<string> replace_aliases(vector<string> &,map<string,vector<string>> &);
+
+// string replace_aliases_process(Process &,map<string,string> &);
+
+void create_alias(vector<string> &,map<string,vector<string>> &);

@@ -48,3 +48,7 @@ void Process::set_background(bool flag) {
 bool Process::get_background() {
 	return this->is_background;
 }
+
+void Process::change_all_arguments(vector<string> &new_args) {
+	this->arguments = new_args;
+}

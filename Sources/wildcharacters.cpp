@@ -1,9 +1,11 @@
 #include "headers.h"
 
 void wildcards(Process &process,vector<Process> &pipes) {
+	
+	// if we haven't pipes replace only main process arguments
 	if(pipes.size() == 0) {
 		fix_args(process);
-	} else {
+	} else {	// if we have pipes for all pipe processes replace arguments
 		fix_args(process);
 		for(vector<Process>::iterator it = pipes.begin(); it!= pipes.end(); it++) {
 			fix_args(*it);
@@ -11,44 +13,33 @@ void wildcards(Process &process,vector<Process> &pipes) {
 	}
 }
 
-void fix_args(Process &process) {
+static void fix_args(Process &process) {
 	
 	vector<string> args = process.get_arguments();
 	vector<string> new_args;
 
-	 for (const auto& arg : args) {
+	// for all arguments
+	for (const auto& arg : args) {
         glob_t globResults;
+
+		// if exist wildcard change
         if(glob(arg.c_str(), GLOB_TILDE, nullptr, &globResults) == 0) {
+			
+			// for every new chang
 			for (size_t i = 0; i < globResults.gl_pathc; i++) {
+			
+				// insert it to new arguments array
 				string str(globResults.gl_pathv[i]);
 				new_args.push_back(str);
 			}
 			globfree(&globResults);
 		} else {
+
+			// if dosn't exist change, insert argument to array
 			new_args.push_back(arg);
 		}
 	}
+
+	// change all arguments with new one
     process.change_all_arguments(new_args);
 }
-
-
-// vector<vector<string>> wildcards(vector<string> &line) {
-// 	vector<vector<string>> results;
-// 	glob_t glob_result;
-
-//     for (auto pattern : line) {
-// 		vector<string> matches;
-//         if (glob(pattern.c_str(), GLOB_NOSORT, NULL, &glob_result) == 0) {
-//             for (size_t i = 0; i < glob_result.gl_pathc; ++i) {
-//                 matches.push_back(string(glob_result.gl_pathv[i]));
-//             }
-            
-//         } else {
-// 			matches.push_back(pattern);
-// 		}
-// 		results.push_back(matches);
-//     }
-
-//     globfree(&glob_result);
-//     return results;
-// }

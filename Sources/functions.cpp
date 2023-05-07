@@ -1,5 +1,7 @@
 #include "headers.h"
 
+
+// split words at symbol c 
 bool splitOnSymbol(vector<string> &words, int i, char c) {
     if (words[i].size() < 2) return false;
 
@@ -21,25 +23,26 @@ bool splitOnSymbol(vector<string> &words, int i, char c) {
     } else return false;
 }
 
-vector<string> string_line_to_vector(string &s) {
+vector<string> string_line_to_vector(string &line) {
 
     vector<string> ret;
     int pos = 0;
     int space;
     
-    while ((space = s.find(' ', pos)) != std::string::npos) {
-        string word = s.substr(pos, space - pos);
+    // split at spaces
+    while ((space = line.find(' ', pos)) != string::npos) {
+        string word = line.substr(pos, space - pos);
         if (!word.empty()) {
             ret.push_back(word);
         }
         pos = space + 1;
     }
-
-    string lastWord = s.substr(pos, s.size() - pos);
+    string lastWord = line.substr(pos, line.size() - pos);
     if (!lastWord.empty()) {
         ret.push_back(lastWord);
     }
 
+    // split at special characters
     for (int i = 0; i < ret.size(); ++i) {
         for (auto c : {'&', '<', '>', '|', ';','"'}) {
             if (splitOnSymbol(ret, i, c)) {
